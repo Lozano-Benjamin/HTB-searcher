@@ -33,7 +33,7 @@ declare -i parameter_counter=0
 while getopts "m:h" arg; do
   case $arg in
     m) machine_name=$OPTARG; let parameter_counter+=1;;
-    h) show_help;;
+    h) ;;
   esac
 done
 
