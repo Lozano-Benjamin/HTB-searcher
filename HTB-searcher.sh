@@ -15,7 +15,30 @@ function ctrl_c(){
   exit 1
 }
 
+function show_help(){
+  echo -e "\n[+] Uso:\n"
+}
+
+function search_machine(){ 
+  machine_name=$1
+  echo $machine_name
+}
+
 #Ctrl + C
 trap ctrl_c INT
 
-sleep 10
+# Indicadores
+declare -i parameter_counter=0
+
+while getopts "m:h" arg; do
+  case $arg in
+    m) machine_name=$OPTARG; let parameter_counter+=1;;
+    h) show_help;;
+  esac
+done
+
+if [ $parameter_counter -eq 1 ]; then
+  search_machine $machine_name
+else
+  show_help
+fi
