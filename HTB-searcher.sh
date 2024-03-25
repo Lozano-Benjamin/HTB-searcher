@@ -52,8 +52,20 @@ function update_files(){
 }
 
 function search_machine(){ 
-  echo -e "${yellowColour}[+]${endColour}${grayColour}Listando la maquina${endColour}"
-  cat bundle.js | grep "name: \"$machine_name\"" -A 9 | grep -vE "id:|sku:|resuelta:" | tr -d '"' | sed 's/^ *//'
+  machine_name="$1"
+  machine_data=$(cat bundle.js | grep "name: \"$machine_name\"" -A 9 | grep -vE "id:|sku:|resuelta:" | tr -d '"' | sed 's/^ *//')
+  if [ "$machine_data" ] ; then
+    echo -e "${yellowColour}[+]${endColour}${grayColour}Listando la maquina${endColour}"
+    echo "$machine_data"
+  else
+    echo -e "[!] La maquina proporcionada no existe" 
+  fi
+}
+
+function get_youtube_solution(){
+  machine_name=$1
+  link=$(cat bundle.js | grep "name: \"$machine_name\"" -A 9 | grep "youtube" | tr -d "," | sed 's/^ *//' | awk '{print $2}')
+  echo -e "[+] El link de la solucion de la maquina es: $link"
 }
 
 function search_ip(){
@@ -63,11 +75,36 @@ function search_ip(){
  search_machine $machine_name
 }
 
-while getopts "m:ui:h" arg; do
+function search_by_difficulty(){
+  difficulty=$1
+  result=$(cat bundle.js | grep "dificultad: \"$difficulty\"" -B 5 | grep "name:" | awk '{print $2}' | tr -d '"' | tr -d ',' | column)
+
+  if [ "$result" ]; then
+  cat bundle.js | grep "dificultad: \"$difficulty\"" -B 5 | grep name | awk '{print $2}' | tr -d '"' | tr -d ',' | column
+  else 
+  echo -e "[!] No existe maquina con esa dificultad"
+  fi
+}
+
+function search_by_os(){
+  os=$1
+  result=$(cat bundle.js | grep "so: \"$os\"" -B 4 | grep "name:" | awk '{print $2}' | tr -d '"' | tr -d ',' | column)
+  
+  if [ "$result" ]; then
+    cat bundle.js | grep "so: \"$os\"" -B 4 | grep "name:" | awk '{print $2}' | tr -d '"' | tr -d ',' | column
+  else
+    echo -e "[!] No existen maquinas con ese OS"
+  fi
+}
+
+while getopts "m:ui:y:d:o:h" arg; do
   case $arg in
     m) machine_name=$OPTARG; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
     i) ip_address=$OPTARG; let parameter_counter+=3;;
+    y) machine_name=$OPTARG; let parameter_counter+=4;;
+    d) difficulty=$OPTARG; let parameter_counter+=5;;
+    o) os=$OPTARG; let parameter_counter+=6;;
     h) ;;
   esac
 done
@@ -78,6 +115,12 @@ elif [ $parameter_counter -eq 2 ]; then
   update_files
 elif [ $parameter_counter -eq 3 ]; then
   search_ip $ip_address
+elif [ $parameter_counter -eq 4 ]; then
+  get_youtube_solution $machine_name
+elif [ $parameter_counter -eq 5 ]; then
+  search_by_difficulty $difficulty
+elif [ $parameter_counter -eq 6 ]; then
+  search_by_os $os
 else
   show_help
 fi
