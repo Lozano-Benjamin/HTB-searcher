@@ -18,8 +18,13 @@ function ctrl_c(){
 function show_help(){
   echo -e "\n${yellowColour}[+]${endColour}${grayColour}Uso:${endColour}"
   echo -e "\t ${purpleColour}m)${endColour} ${turquoiseColour}Buscar un por nombre de maquina${turquoiseColour}"
+  echo -e "\t ${purpleColour}u)${endColour} ${turquoiseColour}Actualizar sistema${turquoiseColour}"
   echo -e "\t ${purpleColour}h)${endColour}${turquoiseColour} Mostrar este panel de ayuda${endColour}"
   echo -e "\n"
+}
+
+function update_files(){
+  echo -e "\n ${yellowColour}[+]${endColour}${grayColour}Actualizacion comenzada${endColour}"
 }
 
 function search_machine(){ 
@@ -33,15 +38,18 @@ trap ctrl_c INT
 # Indicadores
 declare -i parameter_counter=0
 
-while getopts "m:h" arg; do
+while getopts "m:uh" arg; do
   case $arg in
     m) machine_name=$OPTARG; let parameter_counter+=1;;
+    u) let parameter_counter+=2;;
     h) ;;
   esac
 done
 
 if [ $parameter_counter -eq 1 ]; then
   search_machine $machine_name
+elif [ $parameter_counter -eq 2 ]; then
+  update_files
 else
   show_help
 fi
