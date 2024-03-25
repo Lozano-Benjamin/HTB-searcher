@@ -29,13 +29,15 @@ function show_help(){
 function update_files(){
    if [ ! -f bundle.js ]; then
     tput civis
-    echo -e "\n[+] Descargando los archivos necesarios.."
+    echo -e "\n${yellowColour}[+]${endColour}${purpleColour} Descargando los archivos necesarios..${endColour}"
     curl -s $main_url > bundle.js
     js-beautify bundle.js | sponge bundle.js
-    echo -e "\n[+] Actualizacion completada"
+    echo -e "\n${yellowColour}[+]${endColour}${purpleColour} Actualizacion completada ${endColour}"
     tput cnorm
   else
-    echo "Bundle.js existe"
+    if curl -s https://htbmachines.github.io/bundle.js | js-beautify | cmp bundle.js -; then
+      echo -e "${yellowColour}[+]${endColour}${purpleColour} Sistema actualizado ${endColour}"
+    fi
   fi
   }
 
