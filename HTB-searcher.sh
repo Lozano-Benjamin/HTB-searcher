@@ -3,6 +3,12 @@
 # Variables globales
 main_url="https://htbmachines.github.io/bundle.js"
 
+#Ctrl + C
+trap ctrl_c INT
+
+# Indicadores
+declare -i parameter_counter=0
+
 #Colours
 greenColour="\e[0;32m\033[1m"
 endColour="\033[0m\e[0m"
@@ -30,27 +36,24 @@ function update_files(){
    if [ ! -f bundle.js ]; then
     tput civis
     echo -e "\n${yellowColour}[+]${endColour}${purpleColour} Descargando los archivos necesarios..${endColour}"
-    curl -s $main_url > bundle.js
-    js-beautify bundle.js | sponge bundle.js
+    curl -s $main_url > bundle.js | js-beautify bundle.js | sponge bundle.js
     echo -e "\n${yellowColour}[+]${endColour}${purpleColour} Actualizacion completada ${endColour}"
     tput cnorm
   else
     if curl -s https://htbmachines.github.io/bundle.js | js-beautify | cmp bundle.js -; then
-      echo -e "${yellowColour}[+]${endColour}${purpleColour} Sistema actualizado ${endColour}"
+      echo -e "${yellowColour}[+]${endColour}${purpleColour} No se han encontrado actualizaciones ${endColour}"
+    else
+      echo -e "${yellowColour}[!]${endColour}${purpleColour}Se ha encontrado una actualizacion${endColour}"
+      curl -s $main_url > bundle.js | js-beautify bundle.js | sponge bundle.js
+      echo -e "${yellowColour}[+]${endColour}${purpleColour}La actualizacion se ha realizado con exito${endColour}"
     fi
   fi
-  }
-
-function search_machine(){ 
-  machine_name=$1
-  echo $machine_name
 }
 
-#Ctrl + C
-trap ctrl_c INT
-
-# Indicadores
-declare -i parameter_counter=0
+function search_machine(){ 
+  echo -e "${yellowColour}[+]${endColour}${grayColour}Listando la maquina${endColour}"
+  cat bundle.js | grep "name: \"$machine_name\"" -A 9 | grep -vE "id:|sku:|resuelta:" | tr -d '"' | sed 's/^ *//'
+}
 
 while getopts "m:uh" arg; do
   case $arg in
