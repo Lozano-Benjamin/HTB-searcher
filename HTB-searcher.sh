@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Variables globales
+main_url="https://htbmachines.github.io/bundle.js"
+
 #Colours
 greenColour="\e[0;32m\033[1m"
 endColour="\033[0m\e[0m"
@@ -24,8 +27,17 @@ function show_help(){
 }
 
 function update_files(){
-  echo -e "\n ${yellowColour}[+]${endColour}${grayColour}Actualizacion comenzada${endColour}"
-}
+   if [ ! -f bundle.js ]; then
+    tput civis
+    echo -e "\n[+] Descargando los archivos necesarios.."
+    curl -s $main_url > bundle.js
+    js-beautify bundle.js | sponge bundle.js
+    echo -e "\n[+] Actualizacion completada"
+    tput cnorm
+  else
+    echo "Bundle.js existe"
+  fi
+  }
 
 function search_machine(){ 
   machine_name=$1
