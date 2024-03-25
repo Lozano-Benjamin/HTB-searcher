@@ -8,6 +8,8 @@ trap ctrl_c INT
 
 # Indicadores
 declare -i parameter_counter=0
+declare -i aviso_difficulty=0
+declare -i aviso_os=1
 
 #Colours
 greenColour="\e[0;32m\033[1m"
@@ -97,14 +99,26 @@ function search_by_os(){
   fi
 }
 
+function get_by_difficulty_and_os(){
+  difficulty=$1
+  os=$2
+  result=$(cat bundle.js | grep "so: \"$os\"" -C 4 | grep "dificultad: \"$difficulty\"" -B 5 | grep "name:" | tr -d '"' | tr -d ',' | awk '{print $2}')
+  if [ "$result" ]; then
+    echo "$result" | column
+  else
+    echo "[!] No se encontro maquina con esas particularidades"
+  fi 
+}
+
+
 while getopts "m:ui:y:d:o:h" arg; do
   case $arg in
     m) machine_name=$OPTARG; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
     i) ip_address=$OPTARG; let parameter_counter+=3;;
     y) machine_name=$OPTARG; let parameter_counter+=4;;
-    d) difficulty=$OPTARG; let parameter_counter+=5;;
-    o) os=$OPTARG; let parameter_counter+=6;;
+    d) difficulty=$OPTARG; aviso_difficulty=1 ; let parameter_counter+=5;;
+    o) os=$OPTARG; aviso_os=1 ; let parameter_counter+=6;;
     h) ;;
   esac
 done
@@ -117,6 +131,8 @@ elif [ $parameter_counter -eq 3 ]; then
   search_ip $ip_address
 elif [ $parameter_counter -eq 4 ]; then
   get_youtube_solution $machine_name
+elif [ $aviso_os -eq 1 ] && [ $aviso_difficulty=1 ]; then
+  get_by_difficulty_and_os $difficulty $os
 elif [ $parameter_counter -eq 5 ]; then
   search_by_difficulty $difficulty
 elif [ $parameter_counter -eq 6 ]; then
