@@ -11,12 +11,15 @@ turquoiseColour="\e[0;36m\033[1m"
 grayColour="\e[0;37m\033[1m"
 
 function ctrl_c(){
-  echo -e "\n\n${redColour}[!] Saliendo....\n${endColour}"
+  echo -e "\n\n${redColour}[!] Saliendo....${endColour}"
   exit 1
 }
 
 function show_help(){
-  echo -e "\n[+] Uso:\n"
+  echo -e "\n${yellowColour}[+]${endColour}${grayColour}Uso:${endColour}"
+  echo -e "\t ${purpleColour}m)${endColour} ${turquoiseColour}Buscar un por nombre de maquina${turquoiseColour}"
+  echo -e "\t ${purpleColour}h)${endColour}${turquoiseColour} Mostrar este panel de ayuda${endColour}"
+  echo -e "\n"
 }
 
 function search_machine(){ 
