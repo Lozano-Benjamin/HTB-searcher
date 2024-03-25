@@ -27,6 +27,7 @@ function ctrl_c(){
 function show_help(){
   echo -e "\n${yellowColour}[+]${endColour}${grayColour}Uso:${endColour}"
   echo -e "\t ${purpleColour}m)${endColour} ${turquoiseColour}Buscar un por nombre de maquina${turquoiseColour}"
+  echo -e "\t ${purpleColour}i)${endColour} ${turquoiseColour}Buscar un por ip de maquina${turquoiseColour}"
   echo -e "\t ${purpleColour}u)${endColour} ${turquoiseColour}Actualizar sistema${turquoiseColour}"
   echo -e "\t ${purpleColour}h)${endColour}${turquoiseColour} Mostrar este panel de ayuda${endColour}"
   echo -e "\n"
@@ -55,10 +56,18 @@ function search_machine(){
   cat bundle.js | grep "name: \"$machine_name\"" -A 9 | grep -vE "id:|sku:|resuelta:" | tr -d '"' | sed 's/^ *//'
 }
 
-while getopts "m:uh" arg; do
+function search_ip(){
+  ip_address="$1"
+  machine_name="$(cat bundle.js | grep "ip: \"10.10.11.105\"" -B 3 | grep "name:" | awk 'NF{print $NF}' | tr -d '"' | tr -d ',')"
+ echo -e "\n[+] La maquina correspondiente a la IP $ip_address es $machine_name"
+ search_machine $machine_name
+}
+
+while getopts "m:ui:h" arg; do
   case $arg in
     m) machine_name=$OPTARG; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
+    i) ip_address=$OPTARG; let parameter_counter+=3;;
     h) ;;
   esac
 done
@@ -67,6 +76,8 @@ if [ $parameter_counter -eq 1 ]; then
   search_machine $machine_name
 elif [ $parameter_counter -eq 2 ]; then
   update_files
+elif [ $parameter_counter -eq 3 ]; then
+  search_ip $ip_address
 else
   show_help
 fi
